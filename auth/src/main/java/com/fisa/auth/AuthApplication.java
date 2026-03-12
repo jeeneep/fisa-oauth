@@ -1,13 +1,13 @@
-package com.fisa.authorization;
+package com.fisa.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AuthorizationApplication {
+public class AuthApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AuthorizationApplication.class, args);
+		SpringApplication.run(AuthApplication.class, args);
 	}
 
 }

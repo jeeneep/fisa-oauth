@@ -24,6 +24,18 @@ public class ApiController { // 명세서 산출물명 반영!
         );
     }
 
+    @GetMapping("/posts")
+    @PreAuthorize("hasAuthority('SCOPE_read:posts')")
+    public Map<String, Object> getPosts() {
+        return Map.of("posts", "게시글 목록 데이터");
+    }
+
+    @PostMapping("/posts")
+    @PreAuthorize("hasAuthority('SCOPE_write:posts') and hasRole('ROLE_ADMIN')")
+    public Map<String, Object> createPost() {
+        return Map.of("status", "success", "message", "게시글이 작성되었습니다.");
+    }
+
     @GetMapping("/data")
     @PreAuthorize("hasAuthority('SCOPE_read:data')") // read:data 권한이 있어야 통과
     public Map<String, Object> getData() {

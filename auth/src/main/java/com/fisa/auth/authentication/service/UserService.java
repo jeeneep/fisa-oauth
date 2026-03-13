@@ -1,6 +1,6 @@
 package com.fisa.auth.authentication.service;
 
-import com.fisa.auth.authentication.model.Users;
+import com.fisa.auth.authentication.model.User;
 import com.fisa.auth.authentication.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +24,7 @@ public class UserService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        Users user = Users.builder()
+        User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)

@@ -1,10 +1,9 @@
 package com.fisa.auth.authentication.service;
 
-import com.fisa.auth.authentication.model.Users;
+import com.fisa.auth.authentication.model.User;
 import com.fisa.auth.authentication.repository.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,10 +24,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @NonNull
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
-        Users user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
 
-        return User.builder()
+        return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password((user.getPassword()))
                 .roles(user.getRole().replace("ROLE_", ""))

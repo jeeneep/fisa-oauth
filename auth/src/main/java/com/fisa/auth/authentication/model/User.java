@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "DB_A_USERS")
-public class Users {
+@Table(name = "user")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36)

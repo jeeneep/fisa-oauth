@@ -28,7 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/css/**", "/js/**")
+                        .requestMatchers("/register","/oauth2/consent", "/css/**", "/js/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/")
-                        .failureUrl("/login?error=ture")
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -50,10 +50,13 @@ public class SecurityConfig {
     }
 
 
-    //    @Bean
-    public UserDetailsService userDetailsService() {
-        return null;
-    }
+    /**
+     * CustomUserDetailsService 로 대체
+     */
+//    //    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return null;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

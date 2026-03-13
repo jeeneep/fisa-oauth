@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FISA Developers | 회원가입</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f3c88;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            margin: 0;
+            text-align: center;
+            color: #1f3c88;
+            font-size: 42px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            margin: 12px 0 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d0d7e2;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1f3c88;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #1f3c88;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #17306d;
+        }
+
+        .error-box {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #ffe5e5;
+            color: #c62828;
+            font-size: 14px;
+        }
+
+        .field-error {
+            margin-top: 6px;
+            color: #d32f2f;
+            font-size: 12px;
+        }
+
+        .link-box {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .link-box a {
+            color: #1f3c88;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link-box a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="brand">FISA Developers</div>
+    <h1>회원가입</h1>
+    <p class="subtitle">FISA OAuth 앱 등록 및 관리를 위한 개발자 계정을 생성하세요.</p>
+
+    <div class="error-box" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/developer/register}" th:object="${developerSignupRequest}" method="post">
+        <div class="form-group">
+            <label for="username">아이디</label>
+            <input type="text" id="username" th:field="*{username}" placeholder="아이디를 입력하세요">
+            <div class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="비밀번호를 입력하세요">
+            <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="이메일을 입력하세요">
+            <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="companyName">회사명</label>
+            <input type="text" id="companyName" th:field="*{companyName}" placeholder="회사명을 입력하세요">
+        </div>
+
+        <button type="submit" class="btn">회원가입</button>
+    </form>
+
+    <div class="link-box">
+        이미 계정이 있으신가요?
+        <a th:href="@{/developer/login}">로그인</a>
+    </div>
+</div>
+</body>
+</html>

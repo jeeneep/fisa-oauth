@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>hi</title>
+    <title>인증 서버 메인</title>
 </head>
 <body>
-hi
+<h1>인가 서버(포트 9000) 메인 화면</h1>
+<p>아래 버튼을 누르면 8080 클라이언트가 로그인을 요청하는 상황이 시작됩니다.</p>
+
+<a href="/oauth2/authorize?response_type=code&client_id=test-client&scope=openid profile email&redirect_uri=http://127.0.0.1:8080/login/oauth2/code/test-client">
+    <button style="padding: 10px; font-size: 16px;">Test-Client 로그인 및 동의 테스트 시작</button>
+</a>
 </body>
 </html>

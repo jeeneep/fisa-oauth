@@ -2,16 +2,29 @@ package com.fisa.auth.config;
 
 import com.fisa.auth.authentication.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.UUID;
+
+@Slf4j
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
@@ -97,6 +110,47 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JdbcOAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
+    }
+
+    @Bean
+    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientName("Your client name")
+                .clientId("your-client")
+                .clientSecret(passwordEncoder().encode("your-secret"))
+                .clientAuthenticationMethods(methods -> {
+                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                })
+                .authorizationGrantTypes(types -> {
+                    types.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                    types.add(AuthorizationGrantType.REFRESH_TOKEN);
+                })
+                .redirectUris(uri -> {
+                    uri.add("http://localhost:3000");
+                })
+                .postLogoutRedirectUris(uri -> {
+                    uri.add("http://localhost:3000");
+                })
+                .scopes(scope -> {
+                    scope.add(OidcScopes.OPENID);
+                    scope.add(OidcScopes.PROFILE);
+                })
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+                .build();
+
+        JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcOperations);
+        try {
+            registeredClientRepository.save(registeredClient);
+        } catch (IllegalArgumentException e) {
+            log.warn("이미 존재하는 클라이언트 : {}", e.getMessage());
+        }
+
+        return registeredClientRepository;
     }
 
 

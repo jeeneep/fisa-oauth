@@ -9,4 +9,6 @@ public class ConsoleController {
     public String consoleHome() {
         return "developer/console";
     }
+
+
 }

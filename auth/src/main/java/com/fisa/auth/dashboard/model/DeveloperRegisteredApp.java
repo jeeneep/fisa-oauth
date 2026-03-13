@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "developer_registered_app", schema = "auth")
+@Table(name = "developer_registered_app")
 @IdClass(DeveloperRegisteredAppId.class)
 @Getter
 @Builder

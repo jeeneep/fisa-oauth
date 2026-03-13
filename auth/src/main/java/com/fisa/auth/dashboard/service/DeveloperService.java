@@ -1,6 +1,6 @@
 package com.fisa.auth.dashboard.service;
 
-import com.fisa.auth.authentication.model.Users;
+import com.fisa.auth.authentication.model.User;
 import com.fisa.auth.authentication.repository.UserRepository;
 import com.fisa.auth.dashboard.model.Developer;
 import com.fisa.auth.dashboard.model.dto.DeveloperSignupRequest;
@@ -29,7 +29,7 @@ public class DeveloperService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
-        Users user = Users.builder()
+        User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())

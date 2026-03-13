@@ -1,6 +1,6 @@
 package com.fisa.auth.dashboard.model;
 
-import com.fisa.auth.authentication.model.Users;
+import com.fisa.auth.authentication.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,7 +30,7 @@ public class Developer {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private Users user;
+    private User user;
 
     @Column(name = "company_name", length = 100)
     private String companyName;

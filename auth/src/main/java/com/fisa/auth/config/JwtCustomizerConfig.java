@@ -26,8 +26,7 @@ public class JwtCustomizerConfig {
                 context.getClaims()
                         .subject(user.getId())                 // 핵심: sub에는 반드시 UUID(users.id)를 사용 [cite: 25, 26, 28]
                         .claim("username", user.getUsername()) // 표시용 이름 [cite: 25, 28]
-                        .claim("email", user.getEmail())       // 이메일 [cite: 25, 28]
-                        .claim("role", user.getRole());        // 권한 (USER / DEVELOPER) [cite: 25, 28]
+                        .claim("email", user.getEmail());     // 이메일 [cite: 25, 28]
             }
         };
     }

@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .username(user.getUsername())
                 .password((user.getPassword()))
                 .roles(user.getRole().replace("ROLE_", ""))
-                .disabled(!user.isEnabled()) // Users.user 에 isEnabled 타입은 Boolean, 해당 값은 회원 탈퇴 여부를 파악할 수 있음.
+                .disabled(!user.isEnabled()) // 회원 탈퇴 여부를 파악
                 .build();
     }
 }

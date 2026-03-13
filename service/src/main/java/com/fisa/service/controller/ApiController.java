@@ -23,12 +23,11 @@ public class ApiController {
     @PreAuthorize("hasAuthority('SCOPE_profile')")
     public Map<String, Object> getProfile(@AuthenticationPrincipal Jwt jwt) {
 
-        // 1. Auth 서버 엔티티 기준에 맞춰 토큰에서 정보 추출
-        String authServerUserId = jwt.getSubject(); // 보통 Auth 서버의 UUID(id) 또는 username이 들어옵니다.
-        String email = jwt.getClaimAsString("email"); // Auth 서버의 email
-        String username = jwt.getClaimAsString("username"); // Auth 서버의 username! (우리 DB의 nickname으로 쓸 값)
+        String authServerUserId = jwt.getSubject(); // Auth 서버의 UUID
+        String email = jwt.getClaimAsString("email");
+        String username = jwt.getClaimAsString("username");
 
-        // 2. 서비스 DB에 유저 정보 동기화 (우리 DB 필드명인 nickname 자리에 username 값을 넣음)
+        // 서비스 DB에 유저 정보 동기화
         userService.syncUserFromAuthServer(authServerUserId, email, username);
 
         return Map.of(
@@ -48,13 +47,13 @@ public class ApiController {
     }
 
     @PostMapping("/posts")
-    @PreAuthorize("hasAuthority('SCOPE_write:posts')") // Role 조건 삭제!
+    @PreAuthorize("hasAuthority('SCOPE_write:posts')")
     public Map<String, Object> createPost() {
         return Map.of("status", "success", "message", "게시글이 작성되었습니다.");
     }
 
     @GetMapping("/data")
-    @PreAuthorize("hasAuthority('SCOPE_read:data')") // read:data 권한이 있어야 통과
+    @PreAuthorize("hasAuthority('SCOPE_read:data')")
     public Map<String, Object> getData() {
         return Map.of("data", "보안이 중요한 비즈니스 데이터");
     }

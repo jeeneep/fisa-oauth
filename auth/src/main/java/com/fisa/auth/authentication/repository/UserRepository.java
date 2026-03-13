@@ -1,14 +1,14 @@
 package com.fisa.auth.authentication.repository;
 
-import com.fisa.auth.authentication.model.Users;
+import com.fisa.auth.authentication.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<Users, String> {
+public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
 
-    Optional<Users> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 }

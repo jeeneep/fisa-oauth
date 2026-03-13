@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/userinfo")
+
 public class UserInfoController {
 
     @GetMapping

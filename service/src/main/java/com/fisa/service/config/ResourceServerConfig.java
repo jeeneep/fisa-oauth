@@ -24,7 +24,9 @@ public class ResourceServerConfig {
                         .anyRequest().authenticated()/
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> {})
+                        .jwt(jwt -> jwt
+                            .jwkSetUri("http://localhost:9000/.well-known/jwks.json")
+                        )
                 );
 
         return http.build();

@@ -25,20 +25,6 @@ import java.util.UUID;
 @Configuration
 public class ServerConfig {
 
-    // 클라이언트 정보 DB 조회
-    @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-        return new JdbcRegisteredClientRepository(jdbcTemplate);
-    }
-
-    // 인가 코드 및 토큰 정보를 oauth2_authorization 테이블에 저장 (2번 담당자 핵심) [cite: 37, 71]
-    @Bean
-    public OAuth2AuthorizationService authorizationService(
-            JdbcTemplate jdbcTemplate,
-            RegisteredClientRepository registeredClientRepository) {
-        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
-    }
-
     // 사용자 동의 내역을 oauth2_authorization_consent 테이블에 저장
     @Bean
     public OAuth2AuthorizationConsentService authorizationConsentService(

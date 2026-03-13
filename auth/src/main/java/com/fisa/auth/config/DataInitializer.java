@@ -25,12 +25,12 @@ public class DataInitializer {
                         .clientSecret("{noop}secret")
                         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/test-client")
+                        .redirectUri("http://localhost:3000/api/auth/callback/fisa")
                         .scope(OidcScopes.OPENID)
                         .scope(OidcScopes.PROFILE)
                         .scope("email")
                         .clientSettings(ClientSettings.builder()
-                                .requireAuthorizationConsent(true) // 동의 화면 생략
+                                .requireAuthorizationConsent(false) // 동의 화면 생략
                                 .requireProofKey(false) // PKCE 생략
                                 .build())
                         .build();

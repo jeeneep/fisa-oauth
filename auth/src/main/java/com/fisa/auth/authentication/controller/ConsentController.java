@@ -13,7 +13,7 @@ import java.util.Set;
 @Controller
 @RequiredArgsConstructor
 public class ConsentController {
-    @GetMapping("/oauth2/consent")
+    @GetMapping("/oauth3/consent")
     public String consent(
             @RequestParam("client_id") String clientId,
             @RequestParam("scope") String scope,

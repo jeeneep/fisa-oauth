@@ -43,14 +43,17 @@ public class SecurityConfig {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
 
+//        authorizationServerConfigurer
+//                .authorizationEndpoint(authorizationEndpoint ->
+//                        // 본인이 만든 컨트롤러의 GetMapping URL을 입력한다. (예: "/oauth2/consent")
+//                        authorizationEndpoint.consentPage("/oauth3/consent")
+//                );
+
         authorizationServerConfigurer
-                .authorizationEndpoint(authorizationEndpoint ->
-                        // 본인이 만든 컨트롤러의 GetMapping URL을 입력한다. (예: "/oauth2/consent")
-                        authorizationEndpoint.consentPage("/oauth2/consent")
-                );
+                .authorizationEndpoint(Customizer.withDefaults());
 
         RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
-
+//
         http
                 .securityMatcher(endpointsMatcher) // OAuth2 관련 엔드포인트만 가로챔
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
@@ -77,51 +80,52 @@ public class SecurityConfig {
      * 설정했기 때문에 URL 파라미터로 에러/로그아웃 상태를 받아서 메시지를 표시해야함.
      */
     // 개발자 전용 로그인 및 콘솔 접근 제어 체인
-    @Order(2)
-    @Bean
-    public SecurityFilterChain developerFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/developer/**", "/console/**")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/developer/register",
-                                "/developer/login",
-                                "/css/**",
-                                "/js/**"
-                        ).permitAll()
-                        .requestMatchers("/console/**").hasRole("DEVELOPER")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/developer/login")
-                        .loginProcessingUrl("/developer/login")
-                        .defaultSuccessUrl("/console", true)
-                        .failureUrl("/developer/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/developer/logout")
-                        .logoutSuccessUrl("/developer/login?logout=true")
-                        .permitAll()
-                )
-                .userDetailsService(userDetailsService);
-
-        return http.build();
-    }
+//    @Order(2)
+//    @Bean
+//    public SecurityFilterChain developerFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .securityMatcher("/developer/**", "/console/**")
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(
+//                                "/developer/register",
+//                                "/developer/login",
+//                                "/css/**",
+//                                "/js/**"
+//                        ).permitAll()
+//                        .requestMatchers("/console/**").hasRole("DEVELOPER")
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(form -> form
+//                        .loginPage("/developer/login")
+//                        .loginProcessingUrl("/developer/login")
+//                        .defaultSuccessUrl("/console", true)
+//                        .failureUrl("/developer/login?error=true")
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/developer/logout")
+//                        .logoutSuccessUrl("/developer/login?logout=true")
+//                        .permitAll()
+//                )
+//                .userDetailsService(userDetailsService);
+//
+//        return http.build();
+//    }
 
     @Bean
     @Order(3)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("http = " + http);
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register","/oauth2/consent", "/css/**", "/js/**")
+                        .requestMatchers("/register","/oauth3/consent", "/css/**", "/js/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/oauth3/consent")
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
@@ -149,10 +153,12 @@ public class SecurityConfig {
     public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientName("Your client name")
-                .clientId("your-client")
+                .clientId("test-client")
                 .clientSecret(passwordEncoder().encode("your-secret"))
                 .clientAuthenticationMethods(methods -> {
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
+
                 })
                 .authorizationGrantTypes(types -> {
                     types.add(AuthorizationGrantType.AUTHORIZATION_CODE);

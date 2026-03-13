@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FISA Developers | Console</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: white;
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .brand {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f3c88;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 36px;
+            color: #1f3c88;
+        }
+
+        .desc {
+            margin: 16px 0 28px;
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .success-box {
+            padding: 16px;
+            border-radius: 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #1f3c88;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link-btn:hover {
+            background: #17306d;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="brand">FISA Developers</div>
+    <h1>Developer Console</h1>
+    <p class="desc">개발자 로그인에 성공했습니다. 임시 콘솔 메인 페이지입니다.</p>
+
+    <div class="success-box">
+        로그인 성공
+    </div>
+
+    <a href="/developer/logout" class="link-btn">로그아웃</a>
+</div>
+</body>
+</html>

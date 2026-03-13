@@ -17,7 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -112,31 +117,49 @@ public class SecurityConfig {
 //        return http.build();
 //    }
 
+//    @Bean
+//    @Order(3)
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        System.out.println("http = " + http);
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/register","/oauth3/consent", "/css/**", "/js/**")
+//                        .permitAll()
+//                        .anyRequest()
+//                        .authenticated()
+//                )
+//                .formLogin(form -> form
+//                        .loginPage("/login")
+//                        .defaultSuccessUrl("/oauth3/consent")  // ❌ 로그인 후 파라미터 없이 consent로 보내서 문제 발생
+//                        .failureUrl("/login?error=true")
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutSuccessUrl("/login?logout=true")
+//                        .permitAll()
+//                )
+//                .userDetailsService(userDetailsService);
+//
+//        return http.build();
+//    }
+
+    // Spring 기본 로그인 페이지 사용 (/login 자동 생성)
+    // 로그인 후 저장된 원래 요청(/oauth2/authorize?...)으로 자동 리다이렉트
     @Bean
-    @Order(3)
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("http = " + http);
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register","/oauth3/consent", "/css/**", "/js/**")
+                        .requestMatchers("/register", "/css/**", "/js/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/oauth3/consent")
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll()
-                )
-                .userDetailsService(userDetailsService);
+                .formLogin(Customizer.withDefaults())
+                .logout(logout -> logout.permitAll())
+                .userDetailsService(inMemoryUserDetailsService());
 
         return http.build();
-
     }
 
     @Bean
@@ -144,13 +167,64 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+//    // === JDBC 버전 (DB 연결 시 사용) ===
+//    @Bean
+//    public JdbcOAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository) {
+//        return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
+//    }
+//
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
+//        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                .clientName("Your client name")
+//                .clientId("test-client")
+//                .clientSecret(passwordEncoder().encode("your-secret"))
+//                .clientAuthenticationMethods(methods -> {
+//                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+//                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
+//                })
+//                .authorizationGrantTypes(types -> {
+//                    types.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+//                    types.add(AuthorizationGrantType.REFRESH_TOKEN);
+//                })
+//                .redirectUris(uri -> uri.add("http://localhost:3000"))
+//                .postLogoutRedirectUris(uri -> uri.add("http://localhost:3000"))
+//                .scopes(scope -> {
+//                    scope.add(OidcScopes.OPENID);
+//                    scope.add(OidcScopes.PROFILE);
+//                })
+//                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+//                .build();
+//
+//        JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcOperations);
+//        try {
+//            registeredClientRepository.save(registeredClient);
+//        } catch (IllegalArgumentException e) {
+//            log.warn("이미 존재하는 클라이언트 : {}", e.getMessage());
+//        }
+//        return registeredClientRepository;
+//    }
+
+    // === InMemory 버전 ===
+
+    // 초기 로그인 가능 유저 (user / password)
     @Bean
-    public JdbcOAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository) {
-        return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
+    public UserDetailsService inMemoryUserDetailsService() {
+        UserDetails user = org.springframework.security.core.userdetails.User.builder()
+                .username("a")
+                .password(passwordEncoder().encode("a"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(user);
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
+    public InMemoryOAuth2AuthorizationService authorizationService() {
+        return new InMemoryOAuth2AuthorizationService();
+    }
+
+    @Bean
+    public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientName("Your client name")
                 .clientId("test-client")
@@ -158,32 +232,21 @@ public class SecurityConfig {
                 .clientAuthenticationMethods(methods -> {
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
                     methods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
-
                 })
                 .authorizationGrantTypes(types -> {
                     types.add(AuthorizationGrantType.AUTHORIZATION_CODE);
                     types.add(AuthorizationGrantType.REFRESH_TOKEN);
                 })
-                .redirectUris(uri -> {
-                    uri.add("http://localhost:3000");
-                })
-                .postLogoutRedirectUris(uri -> {
-                    uri.add("http://localhost:3000");
-                })
+                .redirectUris(uri -> uri.add("http://localhost:3000"))
+                .postLogoutRedirectUris(uri -> uri.add("http://localhost:3000"))
                 .scopes(scope -> {
                     scope.add(OidcScopes.OPENID);
                     scope.add(OidcScopes.PROFILE);
+                    scope.add(OidcScopes.EMAIL);
                 })
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
 
-        JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcOperations);
-        try {
-            registeredClientRepository.save(registeredClient);
-        } catch (IllegalArgumentException e) {
-            log.warn("이미 존재하는 클라이언트 : {}", e.getMessage());
-        }
-
-        return registeredClientRepository;
+        return new InMemoryRegisteredClientRepository(registeredClient);
     }
 }

@@ -22,7 +22,7 @@ public class ConsentController {
         Set<String> scopeSet = new HashSet<>(Arrays.asList(scope.split(" ")));
 
         model.addAttribute("clientId", clientId);
-        model.addAttribute("scope", scope);
+        model.addAttribute("scopes", scopeSet);
         model.addAttribute("state", state);
 
         return "consent";

@@ -1,6 +1,9 @@
 package com.fisa.auth.authentication.controller;
 
 import com.fisa.auth.authentication.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +27,13 @@ public class RegisterController {
 
 
     @GetMapping("/register")
-    public String registerForm() {
+    public String registerForm(HttpServletRequest request) {
+        // 새로운 가입을 시작할 때 기존 세션을 강제로 날려 이전 유저와의 연결고리를 끊습니다.
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
         return "register"; // Render "register.html"
     }
     @PostMapping("/register")
@@ -35,7 +44,9 @@ public class RegisterController {
         try {
             userService.register(username, password, email);
 
-            return "redirect:/login";
+            return "redirect:/oauth2/authorization/test-client";
+            // return "redirect:/login";
+
         } catch(IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "register";

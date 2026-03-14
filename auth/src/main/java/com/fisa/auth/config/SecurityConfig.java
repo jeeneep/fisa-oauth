@@ -8,26 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-
-import java.util.UUID;
 
 @Slf4j
 @EnableWebSecurity
@@ -114,70 +102,38 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register","/oauth2/consent", "/css/**", "/js/**")
+                        .requestMatchers( "/","/register","/oauth2/consent", "/css/**", "/js/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/", false)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
+                .successHandler((request, response, authentication) -> {
+                    // [성공 로그] 여기서 비로소 토큰 교환 성공 확인 가능
+                    log.info("OAuth2 인증 성공: {}", authentication.getName());
+                    response.sendRedirect("/");
+                })
+            )
+                .headers(headers -> headers
+                    .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
+                )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout=true")
+                    .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)  // 세션 무효화
+                        .clearAuthentication(true)    // 인증 정보 삭제
+                        .deleteCookies("JSESSIONID") // 쿠키 삭제
                         .permitAll()
                 )
                 .userDetailsService(userDetailsService);
 
         return http.build();
-
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    public JdbcOAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository) {
-        return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
-    }
-
-    @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientName("Your client name")
-                .clientId("your-client")
-                .clientSecret(passwordEncoder().encode("your-secret"))
-                .clientAuthenticationMethods(methods -> {
-                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
-                })
-                .authorizationGrantTypes(types -> {
-                    types.add(AuthorizationGrantType.AUTHORIZATION_CODE);
-                    types.add(AuthorizationGrantType.REFRESH_TOKEN);
-                })
-                .redirectUris(uri -> {
-                    uri.add("http://localhost:3000");
-                })
-                .postLogoutRedirectUris(uri -> {
-                    uri.add("http://localhost:3000");
-                })
-                .scopes(scope -> {
-                    scope.add(OidcScopes.OPENID);
-                    scope.add(OidcScopes.PROFILE);
-                })
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
-                .build();
-
-        JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcOperations);
-        try {
-            registeredClientRepository.save(registeredClient);
-        } catch (IllegalArgumentException e) {
-            log.warn("이미 존재하는 클라이언트 : {}", e.getMessage());
-        }
-
-        return registeredClientRepository;
     }
 }

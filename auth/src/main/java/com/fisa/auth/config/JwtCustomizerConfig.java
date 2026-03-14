@@ -1,6 +1,6 @@
 package com.fisa.auth.config;
 
-import com.fisa.auth.authentication.model.Users;
+import com.fisa.auth.authentication.model.User;
 import com.fisa.auth.authentication.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ public class JwtCustomizerConfig {
                 String username = context.getPrincipal().getName();
 
                 // 1번 담당자가 구현한 DB_A.users 연동 로직 호출
-                Users user = userRepository.findByUsername(username)
+                User user = userRepository.findByUsername(username)
                         .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
                 // 명세 3.2장: JWT Payload 스펙 반영 [cite: 23, 24, 25]

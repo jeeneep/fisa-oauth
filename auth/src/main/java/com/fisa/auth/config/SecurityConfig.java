@@ -33,7 +33,6 @@ public class SecurityConfig {
 
         authorizationServerConfigurer
                 .authorizationEndpoint(authorizationEndpoint ->
-                        // 본인이 만든 컨트롤러의 GetMapping URL을 입력한다. (예: "/oauth2/consent")
                         authorizationEndpoint.consentPage("/oauth2/consent")
                 );
 
@@ -97,6 +96,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // 통합 서버 테스트 시
     @Bean
     @Order(3)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -113,17 +113,7 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                .loginPage("/login")
-                .successHandler((request, response, authentication) -> {
-                    // [성공 로그] 여기서 비로소 토큰 교환 성공 확인 가능
-                    log.info("OAuth2 인증 성공: {}", authentication.getName());
-                    response.sendRedirect("/");
-                })
-            )
-                .headers(headers -> headers
-                    .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
-                )
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .logout(logout -> logout
                     .logoutUrl("/logout")
                         .logoutSuccessUrl("/")

@@ -79,7 +79,7 @@ public class ServerConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:9000/login/oauth2/code/test-client")  // 9000 -> 8080
+                .redirectUri("http://localhost:8080/login/oauth2/code/test-client")  // 통합 테스트 시 9000 -> 8080
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .scope("email")

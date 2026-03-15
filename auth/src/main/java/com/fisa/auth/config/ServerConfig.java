@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.authorization.JdbcOAuth2Author
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -48,51 +49,81 @@ public class ServerConfig {
         return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
     }
 
-    // 인가 코드 및 토큰 정보를 oauth2_authorization 테이블에 저장 (2번 담당자 핵심)
+    // 테스트 편의를 위해 in-memory 사용
     @Bean
-    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-        JdbcRegisteredClientRepository repository = new JdbcRegisteredClientRepository(jdbcTemplate);
-        // 희연님 작성 부분 - 개발자 콘솔
-        if (repository.findByClientId("your-client") == null) {
-            RegisteredClient developerClient = RegisteredClient.withId(UUID.randomUUID().toString())
+    public RegisteredClientRepository registeredClientRepository() {
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientName("Your client name")
-                .clientId("your-client")
-                .clientSecret(passwordEncoder().encode("your-secret")) // 암호화 유지
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN) // 유지
-                .redirectUri("http://localhost:3000")
-                .postLogoutRedirectUri("http://localhost:3000") // 유지
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder()
-                    .requireAuthorizationConsent(false) // 팀원의 의도 유지
-                    .build())
-                .build();
-            repository.save(developerClient);
-        }
-
-        if (repository.findByClientId("test-client") == null) {
-            RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("test-client")
-                .clientSecret("{noop}secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:8080/login/oauth2/code/test-client")  // 통합 테스트 시 9000 -> 8080
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .scope("email")
+                .clientSecret(passwordEncoder().encode("your-secret"))
+                .clientAuthenticationMethods(methods -> {
+                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                    methods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
+                })
+                .authorizationGrantTypes(types -> {
+                    types.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                    types.add(AuthorizationGrantType.REFRESH_TOKEN);
+                })
+                .redirectUri("http://localhost:3000/api/auth/callback/fisa") // auth.js 설정
+                .postLogoutRedirectUri("http://localhost:3000")
+                .scopes(scope -> {
+                    scope.add(OidcScopes.OPENID);
+                    scope.add(OidcScopes.PROFILE);
+                    scope.add("email");
+                })
                 .clientSettings(ClientSettings.builder()
-                    .requireAuthorizationConsent(true)
-                    .requireProofKey(false)
-                    .build())
+                        .requireAuthorizationConsent(true)
+                        .build())
                 .build();
-            repository.save(registeredClient);
-        }
 
-        return repository;
+        return new InMemoryRegisteredClientRepository(registeredClient);
     }
+
+    // 인가 코드 및 토큰 정보를 oauth2_authorization 테이블에 저장 (2번 담당자 핵심)
+//    @Bean
+//    public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+//        JdbcRegisteredClientRepository repository = new JdbcRegisteredClientRepository(jdbcTemplate);
+//        // 희연님 작성 부분 - 개발자 콘솔
+//        if (repository.findByClientId("your-client") == null) {
+//            RegisteredClient developerClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                .clientName("Your client name")
+//                .clientId("your-client")
+//                .clientSecret(passwordEncoder().encode("your-secret")) // 암호화 유지
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN) // 유지
+//                .redirectUri("http://localhost:3000")
+//                .postLogoutRedirectUri("http://localhost:3000") // 유지
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+//                .clientSettings(ClientSettings.builder()
+//                    .requireAuthorizationConsent(false) // 팀원의 의도 유지
+//                    .build())
+//                .build();
+//            repository.save(developerClient);
+//        }
+//
+//        if (repository.findByClientId("test-client") == null) {
+//            RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+//                .clientId("test-client")
+//                .clientSecret("{noop}secret")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//                .redirectUri("http://localhost:8080/login/oauth2/code/test-client")  // 통합 테스트 시 9000 -> 8080
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+//                .scope("email")
+//                .clientSettings(ClientSettings.builder()
+//                    .requireAuthorizationConsent(true)
+//                    .requireProofKey(false)
+//                    .build())
+//                .build();
+//            repository.save(registeredClient);
+//        }
+//
+//        return repository;
+//    }
 
     // 사용자 동의 내역을 oauth2_authorization_consent 테이블에 저장
     @Bean

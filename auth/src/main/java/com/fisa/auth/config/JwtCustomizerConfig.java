@@ -4,6 +4,7 @@ import com.fisa.auth.authentication.model.User;
 import com.fisa.auth.authentication.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
@@ -15,7 +16,8 @@ public class JwtCustomizerConfig {
     public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(UserRepository userRepository) {
         return context -> {
             // Access Token 발급 시에만 커스터마이징 동작
-            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())
+                    || OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
                 String username = context.getPrincipal().getName();
 
                 // 1번 담당자가 구현한 DB_A.users 연동 로직 호출
@@ -25,7 +27,7 @@ public class JwtCustomizerConfig {
                 // 명세 3.2장: JWT Payload 스펙 반영 [cite: 23, 24, 25]
                 context.getClaims()
                         .subject(user.getId())                 // 핵심: sub에는 반드시 UUID(users.id)를 사용 [cite: 25, 26, 28]
-                        .claim("username", user.getUsername()) // 표시용 이름 [cite: 25, 28]
+                        .claim("name", user.getUsername()) // 표시용 이름 [cite: 25, 28]
                         .claim("email", user.getEmail());     // 이메일 [cite: 25, 28]
             }
         };

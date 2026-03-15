@@ -29,8 +29,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server' // 4.0 공식 명칭 복구
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'  // 단일 서버 테스트 시
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'  // 통합 서버 테스트 시
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc' // 4.0 공식 명칭
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'

@@ -55,39 +55,40 @@ public class ServerConfig {
         // 희연님 작성 부분 - 개발자 콘솔
         if (repository.findByClientId("your-client") == null) {
             RegisteredClient developerClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientName("Your client name")
-                .clientId("your-client")
-                .clientSecret(passwordEncoder().encode("your-secret")) // 암호화 유지
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN) // 유지
-                .redirectUri("http://localhost:3000")
-                .postLogoutRedirectUri("http://localhost:3000") // 유지
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder()
-                    .requireAuthorizationConsent(false) // 팀원의 의도 유지
-                    .build())
-                .build();
+                    .clientName("Your client name")
+                    .clientId("your-client")
+                    .clientSecret(passwordEncoder().encode("your-secret")) // 암호화 유지
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN) // 유지
+                    .redirectUri("http://localhost:3000/api/auth/callback/fisa")
+                    .postLogoutRedirectUri("http://localhost:3000") // 유지
+                    .scope(OidcScopes.OPENID)
+                    .scope(OidcScopes.PROFILE)
+                    .scope("email")
+                    .clientSettings(ClientSettings.builder()
+                            .requireAuthorizationConsent(false) // 팀원의 의도 유지
+                            .build())
+                    .build();
             repository.save(developerClient);
         }
 
         if (repository.findByClientId("test-client") == null) {
             RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("test-client")
-                .clientSecret("{noop}secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:9000/login/oauth2/code/test-client")  // 9000 -> 8080
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .scope("email")
-                .clientSettings(ClientSettings.builder()
-                    .requireAuthorizationConsent(true)
-                    .requireProofKey(false)
-                    .build())
-                .build();
+                    .clientId("test-client")
+                    .clientSecret("{noop}secret")
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                    .redirectUri("http://localhost:8080/login/oauth2/code/test-client")  // 통합 테스트 시 9000 -> 8080
+                    .scope(OidcScopes.OPENID)
+                    .scope(OidcScopes.PROFILE)
+                    .scope("email")
+                    .clientSettings(ClientSettings.builder()
+                            .requireAuthorizationConsent(true)
+                            .requireProofKey(false)
+                            .build())
+                    .build();
             repository.save(registeredClient);
         }
 

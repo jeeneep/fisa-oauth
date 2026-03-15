@@ -180,9 +180,11 @@ erDiagram
     auth_db_oauth2_registered_client ||--o{ auth_db_developer_registered_app : "registers"
     service_db_user ||--o{ service_db_post : "writes"
 ```
-
+<br>
 <details>
-<summary><b>🛠️ 초기 데이터베이스 및 저장소 세팅 (클릭하여 펼치기)</b></summary>
+<summary><h3>
+  🛠️ 초기 데이터베이스 및 저장소 세팅 (클릭하여 펼치기)
+</h3></summary>
 <div markdown="1">
 
 #### 클라이언트 영속성 관리 (RegisteredClientRepository)
@@ -303,7 +305,7 @@ CREATE TABLE if not exists oauth2_registered_client (
 ```
 </div>
 </details>
-
+<br>
 ---
 
 ## 🔄 핵심 인증 흐름 (Auth Flow)

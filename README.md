@@ -13,16 +13,17 @@
 
 ## 클라이어트 어플리케이션 예시
 예시 클라이언트 어플리케이션에서 Fisa-OAuth 서비스 이용 화면
-
+![Image](https://github.com/user-attachments/assets/2ba7ef99-ad03-4eeb-884a-4aadbbcabae4)
 
 ### 로그인 요청 응답 화면
-
+<img width="3164" height="2070" alt="Image" src="https://github.com/user-attachments/assets/04facce7-b932-4fe9-b30f-be13f6ac6669" />
 
 ### 회원가입 이후 consent 화면
-
+<img width="1582" height="1035" alt="Image" src="https://github.com/user-attachments/assets/dd97f8bb-07ba-4de2-bbc7-a2c9a35ddbde" />
 
 ### 동의 버튼 클릭 이후
-
+<img width="1582" height="1035" alt="Image" src="https://github.com/user-attachments/assets/89a71b99-d020-4a2f-9527-94a8e96a816b" />
+<img width="684" height="113" alt="Image" src="https://github.com/user-attachments/assets/6c4f2b64-aa27-4f19-be0b-d1e3d0d22baf" />
 
 ---
 

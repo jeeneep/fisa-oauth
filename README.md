@@ -455,11 +455,11 @@ public User syncUserFromAuthServer(String authServerUserId, String email, String
 
 ```mermaid
 flowchart LR
-    Request([HTTP 요청]) --> O1{Order 1\nOAuth2 프로토콜인가?}
-    O1 -->|Yes| Chain1[OAuth2 전용 체인\n/oauth2/** 인가 처리]
-    O1 -->|No| O2{Order 2\n개발자 콘솔인가?}
-    O2 -->|Yes| Chain2[개발자 전용 체인\nROLE_DEVELOPER 검증]
-    O2 -->|No| Chain3[Order 3\n일반 사용자 체인\n웹 뷰 및 리소스 접근]
+    Request([HTTP 요청]) --> O1{"Order 1<br>OAuth2 프로토콜인가?"}
+    O1 -->|Yes| Chain1["OAuth2 전용 체인<br>/oauth2/** 인가 처리"]
+    O1 -->|No| O2{"Order 2<br>개발자 콘솔인가?"}
+    O2 -->|Yes| Chain2["개발자 전용 체인<br>ROLE_DEVELOPER 검증"]
+    O2 -->|No| Chain3["Order 3<br>일반 사용자 체인<br>웹 뷰 및 리소스 접근"]
 ```
 
 ### Order 1 - OAuth2 인가 서버 전용 체인
